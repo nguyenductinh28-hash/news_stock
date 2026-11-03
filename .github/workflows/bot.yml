@@ -1,1 +1,29 @@
+name: Telegram bot chung khoan
+
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+# Chỉ cho một lượt chạy tại một thời điểm, lượt sau xếp hàng chờ.
+# Tránh 2 bản cùng lắng nghe một bot (gây lỗi 409 Conflict).
+concurrency:
+  group: telegram-bot
+  cancel-in-progress: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install feedparser requests
+      - run: python bot_chungkhoan_github.py
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          CHAT_ID: ${{ secrets.CHAT_ID }}
+          RUN_SECONDS: "270"
 
