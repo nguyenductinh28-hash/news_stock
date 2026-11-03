@@ -11,19 +11,26 @@ concurrency:
   group: telegram-bot
   cancel-in-progress: false
 
+permissions:
+  contents: read
+
 jobs:
   run:
     runs-on: ubuntu-latest
     timeout-minutes: 8
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-      - run: pip install feedparser requests
-      - run: python bot_chungkhoan_github.py
+      - name: Tai code ve
+        run: git clone --depth 1 "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}.git" src
+
+      - name: Cai thu vien
+        run: |
+          python3 -m venv .venv
+          .venv/bin/pip install --quiet feedparser requests
+
+      - name: Chay bot
+        working-directory: src
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           CHAT_ID: ${{ secrets.CHAT_ID }}
           RUN_SECONDS: "270"
-
+        run: ../.venv/bin/python bot_chungkhoan_github.py
